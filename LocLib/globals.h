@@ -1,6 +1,6 @@
 #include <stdint.h> // uint8_t
 #include <stddef.h> // NULL
-#include <macros_structs.h>
+//#include <macros_structs.h>
 
 #ifndef GLOBALS_H
 #define GLOBALS_H
@@ -11,6 +11,7 @@
 extern uint8_t g_id;
 extern uint8_t g_group;
 extern uint8_t g_status;
+/*
 // g_neighbors[0] = g_id
 extern uint8_t g_neighbors[MAX_NODES];
 extern uint8_t g_num_neighbors;
@@ -72,5 +73,5 @@ extern Position* g_source_cluster;
 extern Position g_source_cluster[MAX_NODES];
 #endif // USE_HEAP
 extern uint8_t g_num_source;
-
+*/
 #endif // GLOBALS_H

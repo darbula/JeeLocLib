@@ -1,2 +1,5 @@
 build*
 .log
+.ipynb_checkpoints
+*.pyc
+*.log

@@ -1,6 +1,6 @@
 #include <stdint.h> // uint8_t
 #include <stddef.h> // NULL
-//#include <macros_structs.h>
+#include <macros_structs.h>
 #include "globals.h"
 
 
@@ -9,7 +9,7 @@ uint8_t g_id = 0; // node id
 uint8_t g_group = 0;
 uint8_t g_status = 0; //current node status
 
-/*
+
 // contains ids
 // g_neighbors[0] is g_id, set up in algorithm
 uint8_t g_neighbors[MAX_NODES] = {0};
@@ -66,7 +66,6 @@ Position g_source_cluster[MAX_NODES];
 #endif // USE_HEAP
 uint8_t g_num_source;
 
-*/
 
 /*
 

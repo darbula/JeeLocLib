@@ -1,14 +1,30 @@
-# Arduino Makefile for Linux
-# Please refer to https://github.com/sudar/Arduino-Makefile
+# clone https://github.com/sudar/Arduino-Makefile@e30bb5 into ARDMK_DIR
+# Notes for windows:
+# make.exe v3.81 must be from avr, not from cygwin
+# egrep.exe should be from cygwin
 
 # Hide the configuration output
 ARDUINO_QUIET = 1
+PROJECT = dftraversal
 
-# Paths and directories
-AVR_TOOLS_DIR = /usr
-ARDMK_DIR = /opt/Arduino-Makefile
+ifeq ($(OS),Windows_NT)
+	C = ../../../../../../../../
 
-BOARD_TAG = atmega328
+	ARDMK_DIR		= C:/Progra~2/Arduino-Makefile
+	ARDUINO_DIR		= $CProgra~2/Arduino
+	#AVR_TOOLS_DIR	= C:/Progra~2/Arduino/hardware/tools/avr
+	AVR_TOOLS_DIR	= C:/WinAVR-20100110
+
+	ARCHITECTURE	= avr
+	BOARD_TAG		= uno
+	SERIAL			= COM
+else
+	AVR_TOOLS_DIR	= /usr
+	ARDMK_DIR		= /opt/Arduino-Makefile
+	BOARD_TAG		= atmega328
+	SERIAL			= /dev/ttyUSB
+endif
+PARTNO = atmega328p
 
 MONITOR_PORT = 25
 
@@ -25,7 +41,7 @@ ifeq (upload_all, $(firstword $(MAKECMDGOALS)))
 .PHONY: upload_all
 upload_all:
 	for port in $(MONITOR_PORTS) ; do \
-		avrdude -q -V -D -p $(BOARD_TAG)p -c arduino -b $(AVRDUDE_ARD_BAUDRATE) -P /dev/ttyUSB$$port -U flash:w:build-$(BOARD_TAG)/traversal.hex:i ; \
+		avrdude -q -V -D -p $(PARTNO) -c arduino -b $(AVRDUDE_ARD_BAUDRATE) -P $(SERIAL)$$port -U flash:w:build-$(BOARD_TAG)/$(PROJECT).hex:i ; \
 	done
 else
 include $(ARDMK_DIR)/Arduino.mk

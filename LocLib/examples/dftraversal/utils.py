@@ -7,14 +7,14 @@ from networkx.drawing.nx_pylab import draw_networkx_edges
 import matplotlib
 import matplotlib.pyplot as plt
 
-MAX_NODES        = 16
-MAX_NEIGHBORS    = 7
+MAX_NODES = 16
+MAX_NEIGHBORS = 7
 MAX_MEASUREMENTS = 112
 
 payload_header = {
     "fields": ["type", "src_id"],
     "format": "BB",
-    }
+}
 
 payload_body = {
     0: {"name": "Spontaneously"},

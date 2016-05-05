@@ -40,7 +40,7 @@
  * temporarily store data to send. Also, while waiting assert that no other
  * event should trigger sending new postponed message.
  * 2. if node is not expecting any incoming messages or alarms use blocking
- * delay sending  without need for temporary storage.
+ * delay sending without need for temporary storage.
  *
  * Message collision can happen in more generic case when there is no
  * synchronised responding. One example is LetUsStitch message sent whenever

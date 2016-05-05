@@ -1,14 +1,10 @@
 from pymote import *
-from pymote.utils.tree import get_root_node
-from numpy import array, average, arange
-import struct
+from numpy import array
 import re
-from networkx.drawing.nx_pylab import draw_networkx_edges
-import matplotlib
-import matplotlib.pyplot as plt
 
-MAX_NODES        = 16
-MAX_NEIGHBORS    = 7
+
+MAX_NODES = 16
+MAX_NEIGHBORS = 7
 MAX_MEASUREMENTS = 112
 
 payload_header = {
@@ -20,7 +16,7 @@ payload_body = {
     0: {"name": "Reset"},
     1: {
         "name": "Token",
-        "fields": ["donep1",],
+        "fields": ["counter", ],
         "format": "B",
         },
     }
@@ -47,7 +43,7 @@ def log_package_function(jeelink, data):
     jeelink.logger.info(log)
 
 
-def get_scale_translation(pos, dim=(1,598)):
+def get_scale_translation(pos, dim=(1, 598)):
     x_min = x_max = float(pos[1])
     y_min = y_max = float(pos[2])
 
@@ -86,5 +82,3 @@ def get_log_data(name, logfile='rf12demo.log'):
     data = map(lambda (i, d): (int(i), d.split(", ")),
             [re.search("\[(\d*).*\]: (.*)", line).groups() for line in lines])
     return data
-
-

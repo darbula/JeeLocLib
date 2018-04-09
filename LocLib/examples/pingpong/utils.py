@@ -1,4 +1,3 @@
-from pymote import *
 from numpy import array
 import re
 
@@ -41,30 +40,6 @@ def log_package_function(jeelink, data):
     payload_body = ": " + payload_body if payload_body else ""
     log = "%s [%s -> %s]%s" % (name, src, dst, payload_body)
     jeelink.logger.info(log)
-
-
-def get_scale_translation(pos, dim=(1, 598)):
-    x_min = x_max = float(pos[1])
-    y_min = y_max = float(pos[2])
-
-    for nid, x, y in zip(*(iter(pos),) * 3):
-        x = float(x)
-        y = float(y)
-        if x<x_min: x_min=x
-        if x>x_max: x_max=x
-        if y<y_min: y_min=y
-        if y>y_max: y_max=y
-    delta_x = x_max-x_min
-    delta_y = y_max-y_min
-    if delta_x==0 or delta_y==0:
-        raise Exception("Pogresne pozicije: %s" % str(pos))
-    if delta_x>delta_y:
-        s = dim[1]/delta_x
-    else:
-        s = dim[1]/delta_y
-    tx = -x_min*s+dim[0]
-    ty = -y_min*s+dim[0]
-    return (s, array([tx, ty]))
 
 
 def get_log_data(name, logfile='rf12demo.log'):

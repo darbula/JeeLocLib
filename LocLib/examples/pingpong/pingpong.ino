@@ -3,14 +3,14 @@
 #include <JeeLib.h>
 #include <LocLib.h>
 
-/**
+/*
  * Node's permanent configuration settings for this program is set in EEPROM
  * with following layout:
  */
 #define ID_EEPROM_ADDR (uint8_t*)0x020
 #define GROUP_EEPROM_ADDR (uint8_t*)0x021
 
-/* New settings in line wit those in rf12Config:
+/* New settings in line with those in rf12Config:
  * byte  0x020  NodeId 1 - 16
  * byte  0x021  GroupId
  */
@@ -55,7 +55,8 @@ Message g_message;
 
 MilliTimer listenTimer;
 
-LedStatePlug ledstate(2,3); //jeenode ports where ledstate plug is plugged
+// jeenode ports where ledstate is plugged
+LedStatePlug ledstate(2, 3);
 
 DisAlgProtocol rf(eeprom_read_byte(ID_EEPROM_ADDR) & 0x1F,
                   eeprom_read_byte(PROTOCOL_EEPROM_ADDR),
@@ -72,12 +73,19 @@ void set_status(uint8_t s);
 void setup() {
   g_id = eeprom_read_byte(ID_EEPROM_ADDR) & 0x1F;
   g_group = eeprom_read_byte(GROUP_EEPROM_ADDR);
+
 #ifdef DEBUG_SERIAL
   Serial.begin(57600);
+  // set timeout for parseInt command
+  Serial.setTimeout(10000);
+  DS("[pingpong]");
+  DS("Node id1: ");
+  D(g_id);
   help();
-  // delay until node switches into listening mode in ms
+  // wait before switching into listening mode
   listenTimer.set(3000);
 #endif // DEBUG_SERIAL
+
   reset();
   rf12_initialize(g_id, RF12_868MHZ, g_group);
 }
@@ -122,7 +130,7 @@ void serial_control(char u) {
       DS("Sent.");
       break;
     case 'r':
-      DS("Listening mode, to exit reset node.");
+      DS("Entering listening mode, reset node to exit.");
       listen_rf_loc();
       break;
    }
@@ -133,40 +141,42 @@ void serial_control(char u) {
  * Help messages.
  */
 void help() {
-  DS("[pingpong]");
-  DS("Node id1: ");
-  D(g_id);
   DS("Select:");
   DS("r - for activating listening mode");
   DS("s - send token to some node");
 }
 
 // MAIN FUNCTION
-/**
- * Listen incoming messages via rf on node with aoa sensor and act and respond
+/*
+ * Listen incoming messages via rf on node and act and respond
  * according to their header, that is, first three bits of rf12_data.
  */
 void listen_rf_loc() {
   while(1) {
     // Messages
     if (rf.receive(&g_message)) {
+      DS("Message received: ");
       switch (g_message.header) {
         case Reset:
+          DS("Reset");
           reset();
           break;
         case Token:
+          DS("Token");
           DS("Token counter: ");
           D(g_message.token.counter);
           switch (g_status) {
             case IDLE:
             case PING:
               g_message.token.counter++;
+              DS("Status Ping");
               delay(1000);
               rf.send(Token, g_message.source, &g_message, 1);
               set_status(PONG);
               break;
             case PONG:
               g_message.token.counter++;
+              DS("Status Pong");
               delay(1000);
               rf.send(Token, g_message.source, &g_message, 1);
               set_status(PING);

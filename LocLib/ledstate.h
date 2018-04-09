@@ -12,11 +12,13 @@
 class LedStatePlug {
     BlinkPlug port1;
     BlinkPlug port2;
+    byte currentState, checkFlags;
 
 public:
     LedStatePlug (byte, byte);
 
     void set(uint8_t);
+    byte buttonCheck();
 };
 
 #endif // ledstate_h

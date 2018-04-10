@@ -186,6 +186,12 @@ void listen_rf_loc() {
       }
     }
 
+    // ********************** Spontanously ************************
+    if (ledstate.buttonCheck()==BlinkPlug::OFF1) {
+      rf.send(Token, 0, &g_message, 1);
+    }
+
+
     // ********************** Timers/Alarms ***********************
     /*
     if (someTimer.poll()) {

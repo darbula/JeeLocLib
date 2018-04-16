@@ -79,7 +79,7 @@ void setup() {
   // set timeout for parseInt command
   Serial.setTimeout(10000);
   DS("[pingpong]");
-  DS("Node id1: ");
+  DS("Node id: ");
   D(g_id);
   help();
   // wait before switching into listening mode
@@ -186,7 +186,7 @@ void listen_rf_loc() {
       }
     }
 
-    // ********************** Spontanously ************************
+    // ********************** Spontaneously ***********************
     if (ledstate.buttonCheck()==BlinkPlug::OFF1) {
       rf.send(Token, 0, &g_message, 1);
     }

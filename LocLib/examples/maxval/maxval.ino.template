@@ -22,6 +22,7 @@
  */
 
 #define OUTBOX_QUEUE_SIZE 10
+#define MAX_NODES 16
 
 // Node statuses
 enum {
@@ -33,12 +34,17 @@ enum {
   Reset,
   Sync,
   SetStatus,
+  SetNeighbors,
   Value,
   Custom,
 };
 
 struct setstatusS {
   uint8_t status;
+};
+
+struct setneighborsS {
+  uint8_t neighbors[MAX_NODES];
 };
 
 struct valueS {
@@ -50,6 +56,7 @@ struct Message {
   uint8_t source;
   union {
     struct setstatusS setstatus;
+    struct setneighborsS setneighbors;
     struct valueS value;
   };
 };
@@ -90,8 +97,11 @@ void set_status(uint8_t);
 uint8_t pushOutboxQueue(uint8_t, uint8_t, void*, uint8_t);
 void processOutbox();
 
-// this is register containing value
+// register containing value
 uint8_t g_val;
+uint8_t g_maxval;
+
+uint8_t g_neighbors[MAX_NODES];
 
 void setup() {
   g_id = eeprom_read_byte(ID_EEPROM_ADDR) & 0x1F;
@@ -104,6 +114,8 @@ void setup() {
   DS("[maxval]");
   DS("Node id: ");
   D(g_id);
+  DS("Node group: ");
+  D(g_group);
 #endif // DEBUG_SERIAL
 
   reset();
@@ -127,7 +139,7 @@ void reset() {
  */
 void loop() {
   // ************************* Messages *************************
-  if (rf.receive(&g_message) && (are_neighbors(g_message.source, g_id) || g_message.source==31)) {
+  if (rf.receive(&g_message) && (are_neighbors(g_id, g_message.source) || g_message.source==31)) {
     DS("Message received: ");
     switch (g_message.header) {
       case Reset:
@@ -143,13 +155,25 @@ void loop() {
         D(g_message.setstatus.status);
         set_status(g_message.setstatus.status);
         break;
+      case SetNeighbors:
+        DS("SetNeighbors neighbors=");
+        for (int i = 0; i < MAX_NODES; ++i) {
+          D(g_message.setneighbors.neighbors[i]);
+        }
+        memcpy(g_neighbors, g_message.setneighbors.neighbors, MAX_NODES);
+        for (int i = 0; i < MAX_NODES; ++i) {
+          D(g_neighbors[i]);
+        }
+        break;
       case Value:
         DS("Value val=");
         D(g_message.value.val);
         g_val = g_message.value.val;
+        g_maxval = g_val;
         set_status(HASVAL);
         break;
       case Custom:
+        /*
         // to send use pushOutboxQueue(header, destination, &g_message, length);
         DS("Custom ");
         switch (g_status) {
@@ -162,6 +186,7 @@ void loop() {
           case MAX:
             break;
         }
+        */
         break;
       default:
         DS("Header not recognized");
@@ -211,9 +236,24 @@ void set_status(uint8_t s) {
 }
 
 uint8_t are_neighbors(uint8_t id1, uint8_t id2) {
-  //return (id1-id2)==1 || (id2-id1)==1;
+  uint8_t ret = 0;
+  for (int i = 0; i < MAX_NODES; ++i) {
+    ret |= g_neighbors[i] && id2==g_neighbors[i];
+    D(id2);
+    D(g_neighbors[i]);
+  }
+  DS("ret");
+  D(ret);
+  return ret;
+  /*
+  // chain
+  return (id1-id2)==1 || (id2-id1)==1;
+  */
+  /*
+  // hypercube
   int x = id1^id2;
   int sum = 0;
   for (int i = 0; i < 4; ++i) sum += (x>>i)&1;
   return sum==1;
+  */
 }
